@@ -1,0 +1,1 @@
+Dans ce fichier, je pense qu'on pourra mettre toutes les choses sur lesquelles on a travaille avant de faire un commit.
