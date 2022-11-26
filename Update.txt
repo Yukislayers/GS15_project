@@ -1,1 +1,11 @@
 Dans ce fichier, je pense qu'on pourra mettre toutes les choses sur lesquelles on a travaille avant de faire un commit.
+
+Find a generator element
+https://stackoverflow.com/questions/61003331/python-finding-all-generators-for-a-cyclic-group
+
+Diffie_hellman.py
+Bout de code pour comprendre l'utilisation de Diffie_hellman
+
+Pour le moment, nous generons un nombre premier de 2048 bit
+Il faut essayer de trouver comment on peut trouver un element generateur de l'ensemble Zp pour 
+pouvoir faire le Diffie_hellman
