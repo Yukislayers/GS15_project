@@ -1,7 +1,12 @@
 import Primal
 
-#Generate a key of 2048 bits for the X3DH.
+#Generate a 2048 bit prime number : p
+p = Primal.primal()
+print("2048 bit prime p is :",p)
+print("p has for bit length : ", p.bit_length())
 
+#Now that we got P
+#We want to find a generator element of Zp
 #This function gives us all the generator of n
 def generator(n):
     size = set(range(1, n))
@@ -14,10 +19,4 @@ def generator(n):
                 results.append(a)
     return results
 
-#Generate a 2048 bit prime number
-p = Primal.primal()
-print("2048 bit prime p is :",p)
-print("p has for bit length : ", p.bit_length())
-
-#gen = generator(p)
 #print(f"Z_p has generators {gen}")
