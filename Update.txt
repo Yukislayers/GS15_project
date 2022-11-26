@@ -9,3 +9,5 @@ Bout de code pour comprendre l'utilisation de Diffie_hellman
 Pour le moment, nous generons un nombre premier de 2048 bit
 Il faut essayer de trouver comment on peut trouver un element generateur de l'ensemble Zp pour 
 pouvoir faire le Diffie_hellman
+
+Concernant le nombre premier p, j'ai decide de le mettre directement dans un fichier txt comme ca, on a pas besoin de le regenerer a chaque fois
