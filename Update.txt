@@ -11,3 +11,7 @@ Il faut essayer de trouver comment on peut trouver un element generateur de l'en
 pouvoir faire le Diffie_hellman
 
 Concernant le nombre premier p, j'ai decide de le mettre directement dans un fichier txt comme ca, on a pas besoin de le regenerer a chaque fois
+
+https://crypto.stackexchange.com/questions/22716/generation-of-a-cyclic-group-of-prime-order
+Changement de strategie, apres avoir generer notre entier p, on va regarder si q = (p-1)/2 est aussi un nombre premier et si il est premier, on aura comme element generateur 
+2, q et 2q de maniere certaine d'apres des proprietes
