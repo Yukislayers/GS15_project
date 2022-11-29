@@ -1,3 +1,4 @@
+from Crypto.Util import number
 
 def generator(n):
     order = n-1

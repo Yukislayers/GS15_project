@@ -15,26 +15,13 @@ p = int(f.read())
 print("2048 bit prime p is :",p)
 print("p has for bit length : ", p.bit_length())
 
-#Now we want to test if q = (p-1)/2 is also prime
-
-q = (p-1)/2
-print("1024 bit prime q is :",q)
-test = int(q)
-print("p has for bit length : ", q.bit_length())
-
 
 #Now that we got P
 #We want to find a generator element of Zp
 
-
-#This function gives us all the generator of n
-
 #Si j'utilise la fonction, j'ai un probleme de memoire
 #Il faut trouver une autre methode que celle en dessous 
 #meme si elle fonctionne pour des petits nombres
-
-# https://medium.com/asecuritysite-when-bob-met-alice/the-cyclic-group-g-of-order-p-f9688dc9cc27
-# a essayer
 
 '''
 def generator(n):
