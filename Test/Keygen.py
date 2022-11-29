@@ -15,6 +15,14 @@ p = int(f.read())
 print("2048 bit prime p is :",p)
 print("p has for bit length : ", p.bit_length())
 
+#Now we want to test if q = (p-1)/2 is also prime
+
+q = (p-1)/2
+print("1024 bit prime q is :",q)
+test = int(q)
+print("p has for bit length : ", q.bit_length())
+
+
 #Now that we got P
 #We want to find a generator element of Zp
 
@@ -28,18 +36,26 @@ print("p has for bit length : ", p.bit_length())
 # https://medium.com/asecuritysite-when-bob-met-alice/the-cyclic-group-g-of-order-p-f9688dc9cc27
 # a essayer
 
-#Dans le corps Zm de taille m avec m premier, il existe au moins un element a d'ordre w=m-1
 '''
-def generator(p):
+def generator(n):
+    order = n-1
     size = set(range(1, n))
     results = []
     for a in size:
         g = set()
         for x in size:
             g.add((a**x)%n)
+            # if we have 1 before x = n-1 then the number will not be a generator
+            if ((a**x)%n) == 1 & x != order:
+                break
             if g == size:
                 results.append(a)
+                #we can use a return here to get the first generator element we found
+                return results               
+        #print(f"iter {a} has g {g}") 
     return results
-'''
 
-#print(f"Z_p has generators {gen}")
+gen = generator(p)
+if gen:
+    print(f"Z_p has for a generator {gen}")
+'''

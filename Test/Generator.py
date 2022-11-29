@@ -23,4 +23,3 @@ for i in range(20):
     if gens:
         print(f"Z_{i} has generators {gens}")
 
-  
