@@ -25,6 +25,10 @@ print("p has for bit length : ", p.bit_length())
 #Il faut trouver une autre methode que celle en dessous 
 #meme si elle fonctionne pour des petits nombres
 
+# https://medium.com/asecuritysite-when-bob-met-alice/the-cyclic-group-g-of-order-p-f9688dc9cc27
+# a essayer
+
+#Dans le corps Zm de taille m avec m premier, il existe au moins un element a d'ordre w=m-1
 '''
 def generator(p):
     size = set(range(1, n))
