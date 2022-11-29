@@ -18,9 +18,7 @@ def generator(n):
         #print(f"iter {a} has g {g}") 
     return results
 
-
 for i in range(20):
     gens = generator(i)
     if gens:
         print(f"Z_{i} has generators {gens}")
-
