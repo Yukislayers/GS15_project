@@ -4,13 +4,13 @@ import os
 #Generate a 2048 bit prime number : p
 #We will store this number in a file so we don't do it every time
 
-if not (os.path.isfile('Test/primal.txt')):
+if not (os.path.isfile('Test/prime.txt')):
     p = Primal.primal()
-    file = open("Test/primal.txt", "w")
+    file = open("Test/prime.txt", "w")
     file.write(str(p))
     file.close()
 
-f = open("Test/primal.txt", "r")
+f = open("Test/prime.txt", "r")
 p = int(f.read())
 print("2048 bit prime p is :",p)
 print("p has for bit length : ", p.bit_length())
