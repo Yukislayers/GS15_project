@@ -1,0 +1,7 @@
+Une KDF est de deriver des cles a partir d'un mot de passe pour qu'on ne puisse pas trouver le mot de passe facilement
+On peut faire des fonctions de hashage en boucle ou plusieurs operations complexes a la suite
+
+Pour la precle, on a une cle principale qui est signe avec une cle secondaire
+Les precles sont des cles que l'on met sur le serveur pour qu'elle soit recuperee plus tard par l'utilisateur qui veut nous contacter
+
+Pas d'utilisation des courbes elliptiques, cela est dit dans le sujet mais il ne faut pas les utiliser
