@@ -20,4 +20,8 @@ Changement de strategie, apres avoir generer notre entier p, on va regarder si q
 J'ai fais en sorte que 2 personnes puissent communiquer
 Cependant pour l'historique des messages, pour le moment, il faudra ouvrir le fichier texte
 A voir si on fait une autre methode par la suite mais pour le moment, on a un moyen de communication fiable
+Il faut aussi que l'on voit notre methode pour faire des upload de fichier mais cela doit pas etre trop complique
 Il faut que l'on se focalise sur le chiffrement et tout l'aspect crypto en priorite 
+
+Pour faire la crypto, je pense qu'on va creer une nouvelle classe et on mettra les differents methodes dedans
+Ensuite on aura juste a faire passer nos inputs dans les methodes de la classe pour le chiffrement
