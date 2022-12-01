@@ -1,1 +1,3 @@
 start of the conversation between Alice and Bob
+Alice : Hello Bob
+Bob : Hello Alice
