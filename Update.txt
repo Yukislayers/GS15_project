@@ -15,3 +15,9 @@ Concernant le nombre premier p, j'ai decide de le mettre directement dans un fic
 https://crypto.stackexchange.com/questions/22716/generation-of-a-cyclic-group-of-prime-order
 Changement de strategie, apres avoir generer notre entier p, on va regarder si q = (p-1)/2 est aussi un nombre premier et si il est premier, on aura comme element generateur 
 2, q et 2q de maniere certaine d'apres des proprietes
+
+
+J'ai fais en sorte que 2 personnes puissent communiquer
+Cependant pour l'historique des messages, pour le moment, il faudra ouvrir le fichier texte
+A voir si on fait une autre methode par la suite mais pour le moment, on a un moyen de communication fiable
+Il faut que l'on se focalise sur le chiffrement et tout l'aspect crypto en priorite 
