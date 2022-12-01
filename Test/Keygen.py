@@ -23,26 +23,30 @@ print("p has for bit length : ", p.bit_length())
 #Il faut trouver une autre methode que celle en dessous 
 #meme si elle fonctionne pour des petits nombres
 
-'''
+#Apres avoir des recherches, il est ecrit que pour faire du DH, il n'est pas necessaire de choisir g avec g un element generateur de notre corps Zp, on peut normalement le choisir 
+#au hasard, le seul interet de choisir g avec g un element generateur de notre groupe Zp est d'avoir un groupe assez grand
+#Je pense donc qu'on peut choisir 2 et on aura un groupe suffisament grand pour ne pas avoir de probleme
+
 def generator(n):
     order = n-1
     size = set(range(1, n))
     results = []
-    for a in size:
-        g = set()
+    g = set()
+    for a in range(10):
         for x in size:
             g.add((a**x)%n)
             # if we have 1 before x = n-1 then the number will not be a generator
             if ((a**x)%n) == 1 & x != order:
+                print(f"iter {a}")
                 break
-            if g == size:
+            if g >= 10000000000000:
                 results.append(a)
                 #we can use a return here to get the first generator element we found
-                return results               
+                #return results               
         #print(f"iter {a} has g {g}") 
     return results
 
 gen = generator(p)
 if gen:
     print(f"Z_p has for a generator {gen}")
-'''
+
