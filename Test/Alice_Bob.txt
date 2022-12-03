@@ -1,3 +1,6 @@
 start of the conversation between Alice and Bob
 Alice : Hello Bob
 Bob : Hello Alice
+Bob : Hello
+Bob : How are you ?
+Alice : Fine thank you
