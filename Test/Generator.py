@@ -1,5 +1,7 @@
 from Crypto.Util import number
 
+#Only for test, not used
+
 #https://crypto.stackexchange.com/questions/9006/how-to-find-generator-g-in-a-cyclic-group
 
 def generator(n):

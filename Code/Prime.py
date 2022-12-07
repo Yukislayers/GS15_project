@@ -56,7 +56,7 @@ def isMillerRabinPassed(mrc):
 			return False
 	return True
 
-def primal() :
+def prime() :
 	while True:
 		n = 2048
 		prime_candidate = getLowLevelPrime(n)

@@ -1,5 +1,7 @@
 from random import randint
 
+#Only for test, not used
+
 if __name__ == '__main__':
 
 	# Both the persons will be agreed upon the
