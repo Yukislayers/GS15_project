@@ -1,3 +1,11 @@
 start of the conversation between Alice and Bob
 Alice : Hello
 Alice : First attempt
+Alice : Hello
+Alice : Hello
+Alice : How are you ?
+Bob : Hello
+Bob : I am fine
+Alice : Heey there
+Alice : How are you
+Alice : Test
