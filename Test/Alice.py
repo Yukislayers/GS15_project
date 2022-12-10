@@ -14,8 +14,8 @@ friend = input("Please enter the name of the person you want to talk to : ")
 
 print('You are going to talk to : ' + friend)
 
-file = 'Test/' + Alice.name + '_' + friend + '.txt'
-revfile = 'Test/' + friend + '_' + Alice.name + '.txt'
+file = Alice.name + '_' + friend + '.txt'
+revfile = friend + '_' + Alice.name + '.txt'
 
 #Verify if a text file between the two already exists
 if not (os.path.isfile(file)) and not (os.path.isfile(revfile)):
@@ -26,8 +26,8 @@ if not (os.path.isfile(file)) and not (os.path.isfile(revfile)):
 else:
     print('File between ' + Alice.name + ' and ' + friend + ' already exists !')
 
-mydir = 'Test/' + Alice.name + '_dir'
-friend_dir = 'Test/' + friend + '_dir'
+mydir = Alice.name + '_dir'
+friend_dir = friend + '_dir'
 
 #Create folder to share files 
 if not (os.path.isdir(mydir)):
