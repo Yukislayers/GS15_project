@@ -75,4 +75,5 @@ f = open("generator.txt", "r")
 g = int(f.read())
 print(f'The generator of our cyclic group is : {g}')
 
+
 print('We now have a prime p of 2048-bit and g, a generator of Zp')
