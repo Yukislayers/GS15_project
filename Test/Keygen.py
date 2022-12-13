@@ -4,7 +4,6 @@ import random
 
 # Generate a 2048-bit prime number : p
 # We will store this number in a file, so we don't do it every time
-
 Valid = False
 counter = 0
 
