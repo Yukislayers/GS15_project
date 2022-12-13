@@ -1,56 +1,78 @@
 import Prime
 import os
+import random
 
-#Generate a 2048 bit prime number : p
-#We will store this number in a file so we don't do it every time
+# Generate a 2048-bit prime number : p
+# We will store this number in a file, so we don't do it every time
 
-if not (os.path.isfile('Test/prime.txt')):
-    p = Prime.prime()
-    file = open("Test/prime.txt", "w")
-    file.write(str(p))
-    file.close()
+Valid = False
+counter = 0
 
-f = open("Test/prime.txt", "r")
+if not (os.path.isfile('prime.txt')):
+    print('We will generate a new safe prime number')
+    while not Valid:
+        print('We try a new prime number')
+        counter += 1
+        print(f'iter : {counter}')
+        # We will try with a library first
+        p = Prime.prime()
+        # the line below is a known safe prime
+        # p = (2**2048) - 1942289
+        print(f'p : {p}')
+        p_minus = p-1
+        # print(p_minus)
+
+        if p_minus % 2 == 0:
+            print('We will now see if q = (p-1)/2 is prime')
+            q = p_minus//2
+            if Prime.isMillerRabinPassed(q):
+                print(f'q : {q}')
+                print('q is prime')
+                Valid = True
+            else:
+                print('q is not prime')
+        else:
+            print('p-1 is not equal to 2q')
+        file = open("prime.txt", "w")
+        file.write(str(p))
+        file.close()
+else:
+    print('We already have a safe prime number generated')
+
+f = open("prime.txt", "r")
 p = int(f.read())
-print("2048 bit prime p is :",p)
+print("2048 bit prime p is :", p)
 print("p has for bit length : ", p.bit_length())
 
+# Now that we have our safe prime
+# We know the only divisor are 1, 2, q and p-1
+# We will generate a random number a and see if a**[1, 2, q, p-1] mod p = 1
 
-#Now that we got P
-#We want to find a generator element of Zp
+p_minus = p - 1
+q = p_minus // 2
+counter = 0
 
-#Si j'utilise la fonction, j'ai un probleme de memoire
-#Il faut trouver une autre methode que celle en dessous 
-#meme si elle fonctionne pour des petits nombres
+if not (os.path.isfile('generator.txt')):
+    print('We will find a generator of our cyclic group')
+    while True:
+        counter += 1
+        print(f'iter : {counter}')
+        g = random.randrange(1, p)
+        print(f'We are testing : {g}')
+        # pour l'utilisation de pow : https://stackoverflow.com/questions/57668289/implement-the-function-fast-modular-exponentiation
+        if pow(g, 1, p) != 1 and pow(g, 2, p) != 1 and pow(g, q, p) != 1 and pow(g, p_minus, p) == 1:
+            print(f'It is a generator or our cyclic group Zp')
+            break
+        else:
+            print(f'It is not a generator of our group Zp')
+        file = open("generator.txt", "w")
+        file.write(str(p))
+        file.close()
+else:
+    print('We already have a generator of our cyclic group')
 
-'''
-def generator(n):
-    order = n-1
-    size = set(range(1, n))
-    results = []
-    g = set()
-    for a in range(10):
-        for x in size:
-            g.add((a**x)%n)
-            # if we have 1 before x = n-1 then the number will not be a generator
-            if ((a**x)%n) == 1 & x != order:
-                print(f"iter {a}")
-                break
-            if g >= 10000000000000:
-                results.append(a)
-                #we can use a return here to get the first generator element we found
-                #return results               
-        #print(f"iter {a} has g {g}") 
-    return results
+f = open("generator.txt", "r")
+g = int(f.read())
+print(f'The generator of our cyclic group is : {g}')
 
-gen = generator(p)
-if gen:
-    print(f"Z_p has for a generator {gen}")
-
-'''
-
-#Apres avoir des recherches, il est ecrit que pour faire du DH, il n'est pas necessaire de choisir g avec g un element generateur de notre corps Zp, on peut normalement le choisir 
-#au hasard, le seul interet de choisir g avec g un element generateur de notre groupe Zp est d'avoir un groupe assez grand
-#Je pense donc qu'on peut choisir 2 et on aura un groupe suffisament grand pour ne pas avoir de probleme
-
-g = 2
+print('We now have a prime p of 2048-bit and g, a generator of Zp')
