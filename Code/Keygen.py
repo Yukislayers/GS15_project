@@ -62,12 +62,12 @@ if not (os.path.isfile('generator.txt')):
         # pour l'utilisation de pow : https://stackoverflow.com/questions/57668289/implement-the-function-fast-modular-exponentiation
         if pow(g, 1, p) != 1 and pow(g, 2, p) != 1 and pow(g, q, p) != 1 and pow(g, p_minus, p) == 1:
             print(f'It is a generator or our cyclic group Zp')
+            file = open("generator.txt", "w")
+            file.write(str(g))
+            file.close()
             break
         else:
             print(f'It is not a generator of our group Zp')
-        file = open("generator.txt", "w")
-        file.write(str(p))
-        file.close()
 else:
     print('We already have a generator of our cyclic group')
 
