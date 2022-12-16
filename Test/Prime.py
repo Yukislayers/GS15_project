@@ -61,9 +61,9 @@ def isMillerRabinPassed(mrc):
     return True
 
 
-def prime():
+def prime(value):
     while True:
-        n = 2048
+        n = value
         prime_candidate = getLowLevelPrime(n)
         if not isMillerRabinPassed(prime_candidate):
             continue

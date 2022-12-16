@@ -1,6 +1,6 @@
 from random import randint
 
-#Only for test, not used
+# Only for test, not used
 
 if __name__ == '__main__':
 
