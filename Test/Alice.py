@@ -108,10 +108,10 @@ class Alice:
         key, iv = self.send_ratchet.next()
         iv = bytes(iv.encode('UTF-8'))
         cipher1 = byte_xor(iv, msg)
-        print(cipher1)
+        # print(cipher1)
         key = bytes(key.encode('UTF-8'))
         cipher2 = byte_xor(key, cipher1)
-        print(cipher2)
+        # print(cipher2)
 
         print('[Alice]\tSending ciphertext to Bob:', cipher2)
 
@@ -125,9 +125,9 @@ class Alice:
         iv = bytes(iv.encode('UTF-8'))
         key = bytes(key.encode('UTF-8'))
         pt2 = byte_xor(cipher, key)
-        print(pt2)
+        # print(pt2)
         pt1 = byte_xor(iv, pt2)
-        print(pt1)
+        # print(pt1)
         print('[Alice]\tDecrypted message:', pt1)
 
 
@@ -164,7 +164,7 @@ def start():
 
             alice.send(bob, b'Hello mon ami')
 
-            bob.send(alice, b'Hello Grognasse !')
+            bob.send(alice, b'Hello  !')
         else:
             print('Error')
             exit()

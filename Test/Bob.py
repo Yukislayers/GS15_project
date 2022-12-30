@@ -95,18 +95,18 @@ class Bob:
         self.send_ratchet = SymmRatchet(shared_send)
         print('[Bob]\tSend ratchet seed:', shared_send)
 
-    def send(self, bob, msg):
+    def send(self, alice, msg):
         key, iv = self.send_ratchet.next()
         iv = bytes(iv.encode('UTF-8'))
         cipher1 = byte_xor(iv, msg)
-        print(cipher1)
+        # print(cipher1)
         key = bytes(key.encode('UTF-8'))
         cipher2 = byte_xor(key, cipher1)
-        print(cipher2)
+        # print(cipher2)
 
-        print('[Alice]\tSending ciphertext to Bob:', cipher2)
+        print('[Bob]\tSending ciphertext to Alice:', cipher2)
 
-        bob.recv(cipher2, self.DHb_ratchet_pub)
+        alice.recv(cipher2, self.DHb_ratchet_pub)
 
     def recv(self, cipher, alice_public_key):
 
@@ -115,10 +115,10 @@ class Bob:
         iv = bytes(iv.encode('UTF-8'))
         key = bytes(key.encode('UTF-8'))
         pt2 = byte_xor(cipher, key)
-        print(pt2)
+        # print(pt2)
         pt1 = byte_xor(iv, pt2)
-        print(pt1)
-        print('[Alice]\tDecrypted message:', pt1)
+        # print(pt1)
+        print('[Bob]\tDecrypted message:', pt1)
 
 
 def start():
