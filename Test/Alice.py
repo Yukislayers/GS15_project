@@ -1,9 +1,28 @@
 import os
+import base64
 from Bob import *
 from Server import *
 from Signature import *
+from Test.SymmRatchet import SymmRatchet
+
+
 # This will be the class of the first person to talk
 
+def b64(msg):
+    # base64 encoding helper function
+    return base64.encodebytes(msg).decode('utf-8').strip()
+
+def pad(msg):
+    # pkcs7 padding
+    num = 16 - (len(msg) % 16)
+    return msg + bytes([num] * num)
+
+def unpad(msg):
+    # remove pkcs7 padding
+    return msg[:-msg[-1]]
+
+def byte_xor(ba1, ba2):
+    return bytes([_a ^ _b for _a, _b in zip(ba1, ba2)])
 
 class Alice:
     if not (os.path.isfile('prime.txt')):
@@ -56,6 +75,62 @@ class Alice:
     # The shared key will be updated later
     shared_key = 0
 
+    # The DHRatchet private key
+    DHa_ratchet_priv = None
+
+
+    def alice_init_ratchet(self):
+        # initialise the root chain with the shared key
+        self.root_ratchet = SymmRatchet(self.shared_key)
+        # initialise the sending and recving chains
+        self.send_ratchet = SymmRatchet(self.root_ratchet.next()[0])
+        self.recv_ratchet = SymmRatchet(self.root_ratchet.next()[0])
+
+    def dh_ratchet(self, bob_public):
+        # perform a DH ratchet rotation using Bob's public key
+        if self.DHa_ratchet_priv is not None:
+            # the first time we don't have a DH ratchet yet
+            dh_recv = Keygen.dh(self.p, self.DHa_ratchet_priv, bob_public)
+            shared_recv = self.root_ratchet.next(dh_recv)[0]
+            # use Bob's public and our old private key
+            # to get a new recv ratchet
+            self.recv_ratchet = SymmRatchet(shared_recv)
+            print('[Alice]\tRecv ratchet seed:', shared_recv)
+        # generate a new key pair and send ratchet
+        # our new public key will be sent with the next message to Bob
+        self.DHa_ratchet_priv = Prime.nBitRandom(2048)
+        dh_send = Keygen.dh(self.p, self.DHa_ratchet_priv, bob_public)
+        shared_send = self.root_ratchet.next(dh_send)[0]
+        self.send_ratchet = SymmRatchet(shared_send)
+        print('[Alice]\tSend ratchet seed:', shared_send)
+
+    def send(self, bob, msg):
+        key, iv = self.send_ratchet.next()
+        iv = bytes(iv.encode('UTF-8'))
+        cipher1 = byte_xor(iv, msg)
+        print(cipher1)
+        key = bytes(key.encode('UTF-8'))
+        cipher2 = byte_xor(key, cipher1)
+        print(cipher2)
+
+        print('[Alice]\tSending ciphertext to Bob:', cipher2)
+
+        self.DHa_ratchet_pub = pow(self.g, self.DHa_ratchet_priv, self.p)
+
+        bob.recv(cipher2, self.DHa_ratchet_pub)
+
+    def recv(self, cipher, bob_public_key):
+        self.dh_ratchet(bob_public_key)
+        key, iv = self.recv_ratchet.next()
+        iv = bytes(iv.encode('UTF-8'))
+        key = bytes(key.encode('UTF-8'))
+        pt2 = byte_xor(cipher, key)
+        print(pt2)
+        pt1 = byte_xor(iv, pt2)
+        print(pt1)
+        print('[Alice]\tDecrypted message:', pt1)
+
+
 
 def start():
     # We create the server and Bob, so we can put the information on the server for the x3dh exchange
@@ -76,6 +151,24 @@ def start():
 
         if server.X3DH_alice_init(alice) == server.X3DH_bob_not_init(bob):
             print(f'The shared key is {alice.shared_key}')
+
+            alice.alice_init_ratchet()
+            bob.bob_init_ratchet()
+
+            print('[Alice]\tsend ratchet:', alice.send_ratchet.next())
+            print('[Bob]\trecv ratchet:', bob.recv_ratchet.next())
+            print('[Alice]\trecv ratchet:', alice.recv_ratchet.next())
+            print('[Bob]\tsend ratchet:', bob.send_ratchet.next())
+
+            alice.dh_ratchet(bob.DHb_ratchet_pub)
+
+            alice.send(bob, b'Hello mon ami')
+
+            bob.send(alice, b'Hello Grognasse !')
+        else:
+            print('Error')
+            exit()
+
     else:
         print('Error')
         exit()

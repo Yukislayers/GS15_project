@@ -2,8 +2,21 @@ import os
 from Alice import *
 from Server import *
 from Signature import *
+from Test.SymmRatchet import SymmRatchet
 # This will be the class of the second person to talk
 
+
+def pad(msg):
+    # pkcs7 padding
+    num = 16 - (len(msg) % 16)
+    return msg + bytes([num] * num)
+
+def unpad(msg):
+    # remove pkcs7 padding
+    return msg[:-msg[-1]]
+
+def byte_xor(ba1, ba2):
+    return bytes([_a ^ _b for _a, _b in zip(ba1, ba2)])
 
 class Bob:
     if not (os.path.isfile('prime.txt')):
@@ -56,6 +69,57 @@ class Bob:
     # The shared key will be updated later
     shared_key = 0
 
+    DHb_ratchet_priv = 31520537626859489247612700576792915348323752089764165996541678560726231871780642343138326665460612962415575073291631928968576159222847986088984902728798193256299951357852364441641154325095964156580211151143915814378849330277236664506152037699756794135322390778829075170992518216371780283753132919638030205952713458018821685533039963948951717105597717157584558241631842719681521258879027542697959964694098829309351861554144057381353137711116961155179400663782427687085244309861983009731915100846211694611983307546890532388992085158949259113104736134619652204858657771730892004246998329188649448624305427122183979762480
+    DHb_ratchet_pub = pow(g, DHb_ratchet_priv, p)
+
+    def bob_init_ratchet(self):
+        # initialise the root chain with the shared key
+        self.root_ratchet = SymmRatchet(self.shared_key)
+        # initialise the sending and recving chains
+        self.send_ratchet = SymmRatchet(self.root_ratchet.next()[0])
+        self.recv_ratchet = SymmRatchet(self.root_ratchet.next()[0])
+
+    def dh_ratchet(self, alice_public):
+        # perform a DH ratchet rotation using Alice's public key
+        dh_recv = Keygen.dh(self.p, self.DHb_ratchet_priv, alice_public)
+        shared_recv = self.root_ratchet.next(dh_recv)[0]
+        # use Alice's public and our old private key
+        # to get a new recv ratchet
+        self.recv_ratchet = SymmRatchet(shared_recv)
+        print('[Bob]\tRecv ratchet seed:', shared_recv)
+        # generate a new key pair and send ratchet
+        # our new public key will be sent with the next message to Alice
+        self.DHratchet = Prime.nBitRandom(2048)
+        dh_send = Keygen.dh(self.p, self.DHratchet, alice_public)
+        shared_send = self.root_ratchet.next(dh_send)[0]
+        self.send_ratchet = SymmRatchet(shared_send)
+        print('[Bob]\tSend ratchet seed:', shared_send)
+
+    def send(self, bob, msg):
+        key, iv = self.send_ratchet.next()
+        iv = bytes(iv.encode('UTF-8'))
+        cipher1 = byte_xor(iv, msg)
+        print(cipher1)
+        key = bytes(key.encode('UTF-8'))
+        cipher2 = byte_xor(key, cipher1)
+        print(cipher2)
+
+        print('[Alice]\tSending ciphertext to Bob:', cipher2)
+
+        bob.recv(cipher2, self.DHb_ratchet_pub)
+
+    def recv(self, cipher, alice_public_key):
+
+        self.dh_ratchet(alice_public_key)
+        key, iv = self.recv_ratchet.next()
+        iv = bytes(iv.encode('UTF-8'))
+        key = bytes(key.encode('UTF-8'))
+        pt2 = byte_xor(cipher, key)
+        print(pt2)
+        pt1 = byte_xor(iv, pt2)
+        print(pt1)
+        print('[Alice]\tDecrypted message:', pt1)
+
 
 def start():
     # We create the server and Bob, so we can put the information on the server for the x3dh exchange
@@ -71,12 +135,17 @@ def start():
 
     # We need to fetch the bundle and check if the signature of Bob SPK is valid
 
-    if rsa_verify(server.SPKb_sig, server.RSAb_pub, server.RSAb_modulo) == server.Hash_SPKb:
+    if rsa_verify(server.SPKa_sig, server.RSAa_pub, server.RSAa_modulo) == server.Hash_SPKa:
         print('The Signature is valid')
         print('We will start the X3DH key exchange')
 
-        if server.X3DH_alice_init(alice) == server.X3DH_bob_not_init(bob):
-            print(f'The shared key is {alice.shared_key}')
+        if server.X3DH_bob_init(bob) == server.X3DH_alice_not_init(alice):
+            print(f'The shared key is {bob.shared_key}')
+
+
+        else:
+            print('Error')
+            exit()
     else:
         print('Error')
         exit()
