@@ -1,6 +1,7 @@
 import Prime
 import os
 import random
+import hashlib
 
 
 def key_generation():
@@ -80,15 +81,16 @@ def key_generation():
     return p, g
 
 
-def dh(p, g, a, b):
-    x = pow(g, a, p)
-    y = pow(g, b, p)
+def dh(p, a, b):
+    return pow(b, a, p)
 
-    ka = pow(y, a, p)
-    kb = pow(x, b, p)
 
-    if ka == kb:
-        sk = ka
-    else:
-        print('There is a problem')
-    return sk
+def hkdf(value, iteration):
+    iterator = 0
+    string_of_value = str(value)
+    while iterator < iteration:
+        string_of_value = string_of_value
+        hashed_value = int(hashlib.sha512(string_of_value.encode()).hexdigest(), 16)
+        string_of_value = str(string_of_value)
+        iterator = iterator + 1
+    return hashed_value

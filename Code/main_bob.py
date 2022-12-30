@@ -1,0 +1,3 @@
+import Bob
+
+Bob.start()

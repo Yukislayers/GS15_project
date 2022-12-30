@@ -1,67 +1,144 @@
 import os
+from Alice import *
+from Server import *
+from Signature import *
+# This will be the class of the second person to talk
 
-#This will be the class of the second person to talk
 
 class Bob:
+    if not (os.path.isfile('prime.txt')):
+        print('You need to first generate a prime number')
+        exit()
+
+    f = open("prime.txt", "r")
+    p = int(f.read())
+    f.close()
+
+    f = open("generator.txt", "r")
+    g = int(f.read())
+    f.close()
+
+    if not (os.path.isfile('generator.txt')):
+        print('You need to first find a generator of our cyclic group')
+        exit()
+
     name = 'Bob'
-    priv_key = 0
-    pub_key = 0
+
+    # Generate Alice IDa key pair
+    IDb_priv = 17177758807324845692857368693377283569917000253711757948276657124373021674370888039262011854095683245856550177330748719217582943929659175533515996172744102803519750499798908547990001632992233932395913831775215383821614113936391861772530934230336453164268743083199682697033834366406975361666116961025136007946791011572750667327044635674282751231969871692911622163309943831870069828335208169679334373285775448463956379942945586690304138107899115228213921677252949168055652170164844799655949842947089993618674947738890047631176672561216795692674325069024030733424792011537968208691097234776785939783641278916001509201309
+    IDb_pub = pow(g, IDb_priv, p)
+
+    # Generate Alice signed pre key
+    # This is the key that should be re-generated every few weeks
+    SPKb_priv = 29481355251797690541460288458135166075606261765334726598143710463430881323931459567281033139363812333774769997448920740617170569969987288276831608864663749372638984723049635442004689704086969304602647971316990663400212114318662466595118391458315687056664178500535475352746938016152807452632808294558053793134281590748034748463294036790536299818050928536353221340592249518272724617816717626171634209349779478180271023721765804188249183757152918492676207974712216940848899527533764101664499115391053384222836979422292138402928357094086734700498813458930932765226856267779411696147344411422222083747019540430560453168553
+    SPKb_pub = pow(g, SPKb_priv, p)
+
+    hashed_SPKb_pub = hash512(SPKb_pub)
+
+    # For the one-time prekeys, we choose a random number
+    OTPKb_priv = 21168411617692412495262355659114213455484933268005729583841322490303255808017152961908500772736051490664908477611675744211135897888703797518257515200958279257135888636693038757429625417268628009296411710756212102428447513784166581475416298186052446279220739015444033555849464587768308444743209626252641433572162281307329233326998007474056313947448000050542640378817206471348251662942821324622083327383083417799138202788228766417892670237318342709484716795206563360836456891993933941748434620406487027517706755243560600074483941990261221585151494912746809346478466770969329660739006349887655520423116400687262857162122
+    OTPKb_pub = pow(g, OTPKb_priv, p)
+
+    # For the ephemeral key, we choose a random number
+    EKb_priv = 21094546904479834322785065407742363982409865787747711471431407417626669123593718673826946060389581302573884462989955004299599044631756338179465536770937671563274130090274792214367534590934623059000139354604832446544261059571421215001787497839888476565275388125056250025101687416842695568512244037299224334430702375807692786169013021893212992517916833787544641722475674595791752690837349898250629773464456575588539173273222622214660477622904785274540089775849780244946046916679814757772487344910609012305818078477798833671635827952228835497949359752431559782120847773335969391710267581307290507963048722482815111841392
+    EKb_pub = pow(g, EKb_priv, p)
+
+    # RSA key pair
+    # Generated with Signature.py file
+    RSAb_priv = 68945648884904663675267175521577444671902605999545536917279248176439396502805884221274794942250444299948482975374038383270805105662978931021514764928325229883767032602852287231302114445905095126494799062310521087393456951326603244793905517822341606438671712590300023108532563308719437607273680193498919565619
+    RSAb_pub = 3146185933466387797585391166964192914607318026918893364146639291582861206230682255437216261693800924044619106554712988485684979347192730098733459790305572379662270806066317486382188875920835230240779434647852255577382729790100053459668994906125353157273376776711205492311892905694832360671825326000906497859
+    RSAb_modulo = 107062777979160845210480721813063478070407333770184406013025472343065269367423043925027554327858725377844257240552880578785530291231936563356958696911181858068479947703182057751582566421831537837815114076015346519661198501653486368255325991177573962976986233599323527727371891920500124410718022461517308776263
+
+    # We create the prekey signature by signing the signed pre key with Bob private key
+    # We will use the rsa signature
+    SPKb_sig = rsa_signature(hashed_SPKb_pub, RSAb_priv, RSAb_modulo)
+
+    # The shared key will be updated later
     shared_key = 0
 
-print('You are : ' + Bob.name)
 
-friend = input("Please enter the name of the person you want to talk to : ")
+def start():
+    # We create the server and Bob, so we can put the information on the server for the x3dh exchange
+    server = Server()
+    bob = Bob()
+    alice = Alice()
 
-print('You are going to talk to : ' + friend)
+    print(f'You are {bob.name}')
 
-file = Bob.name + '_' + friend + '.txt'
-revfile = friend + '_' + Bob.name + '.txt'
+    # We publish the key bundles on the server
+    server.set_alice(alice.IDa_pub, alice.SPKa_pub, alice.SPKa_sig, alice.OTPKa_pub, alice.RSAa_pub, alice.RSAa_modulo,  alice.hashed_SPKa_pub, alice.EKa_pub)
+    server.set_bob(bob.IDb_pub, bob.SPKb_pub, bob.SPKb_sig, bob.OTPKb_pub, bob.RSAb_pub, bob.RSAb_modulo, bob.hashed_SPKb_pub, bob.EKb_pub)
 
-#Verify if a text file between the two already exists
-if not (os.path.isfile(file)) and not (os.path.isfile(revfile)):
-    f = open(file, "w")
-    print('File between ' + Bob.name + ' and ' + friend + ' is created !')
-    f.write("start of the conversation between " + Bob.name + " and " + friend)
-    f.close()
-else:
-    print('File between ' + Bob.name + ' and ' + friend + ' already exists !')
+    # We need to fetch the bundle and check if the signature of Bob SPK is valid
 
-mydir = Bob.name + '_dir'
-friend_dir = friend + '_dir'
+    if rsa_verify(server.SPKb_sig, server.RSAb_pub, server.RSAb_modulo) == server.Hash_SPKb:
+        print('The Signature is valid')
+        print('We will start the X3DH key exchange')
 
-#Create folder to share files 
-if not (os.path.isdir(mydir)):
-    os.mkdir(mydir)
-    print(mydir + ' folder is created')
-else:
-    print(friend_dir + ' folder is already created')
+        if server.X3DH_alice_init(alice) == server.X3DH_bob_not_init(bob):
+            print(f'The shared key is {alice.shared_key}')
+    else:
+        print('Error')
+        exit()
 
-if not (os.path.isdir(friend_dir)):
-    os.mkdir(friend_dir)
-    print(friend_dir + ' folder is created')
-else:
-    print(friend_dir + ' folder is already created')
-
-#Make sure that whatever the order of the name, we will still write in the same file
-#if the two people that communicate have the right names
-if (os.path.isfile(file)):
-    file = file
-else:
-    file = revfile
-
-print('\n-------------------------------------------')
-print('Start of the communication \n')
-
-talking = True
-
-print('If you want to stop, type : STOP')
-
-while talking == True:
-    f = open(file, "a")
-    new_input = input(Bob.name + ' : ')
-    if new_input.lower() == 'stop':
-        talking = False
+    '''
+    # Communication method for the moment
+    print('You are : ' + Bob.name)
+    
+    friend = input("Please enter the name of the person you want to talk to : ")
+    
+    print('You are going to talk to : ' + friend)
+    
+    file = Bob.name + '_' + friend + '.txt'
+    revfile = friend + '_' + Bob.name + '.txt'
+    
+    #Verify if a text file between the two already exists
+    if not (os.path.isfile(file)) and not (os.path.isfile(revfile)):
+        f = open(file, "w")
+        print('File between ' + Bob.name + ' and ' + friend + ' is created !')
+        f.write("start of the conversation between " + Bob.name + " and " + friend)
         f.close()
-        break
-    f.write('\n' + Bob.name + ' : ' + new_input)
-    f.close()
+    else:
+        print('File between ' + Bob.name + ' and ' + friend + ' already exists !')
+    
+    mydir = Bob.name + '_dir'
+    friend_dir = friend + '_dir'
+    
+    #Create folder to share files 
+    if not (os.path.isdir(mydir)):
+        os.mkdir(mydir)
+        print(mydir + ' folder is created')
+    else:
+        print(friend_dir + ' folder is already created')
+    
+    if not (os.path.isdir(friend_dir)):
+        os.mkdir(friend_dir)
+        print(friend_dir + ' folder is created')
+    else:
+        print(friend_dir + ' folder is already created')
+    
+    #Make sure that whatever the order of the name, we will still write in the same file
+    #if the two people that communicate have the right names
+    if (os.path.isfile(file)):
+        file = file
+    else:
+        file = revfile
+    
+    print('\n-------------------------------------------')
+    print('Start of the communication \n')
+    
+    talking = True
+    
+    print('If you want to stop, type : STOP')
+    
+    while talking == True:
+        f = open(file, "a")
+        new_input = input(Bob.name + ' : ')
+        if new_input.lower() == 'stop':
+            talking = False
+            f.close()
+            break
+        f.write('\n' + Bob.name + ' : ' + new_input)
+        f.close()
+    '''
+
