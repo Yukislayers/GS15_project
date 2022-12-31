@@ -8,21 +8,10 @@ from Test.SymmRatchet import SymmRatchet
 
 # This will be the class of the first person to talk
 
-def b64(msg):
-    # base64 encoding helper function
-    return base64.encodebytes(msg).decode('utf-8').strip()
-
-def pad(msg):
-    # pkcs7 padding
-    num = 16 - (len(msg) % 16)
-    return msg + bytes([num] * num)
-
-def unpad(msg):
-    # remove pkcs7 padding
-    return msg[:-msg[-1]]
 
 def byte_xor(ba1, ba2):
     return bytes([_a ^ _b for _a, _b in zip(ba1, ba2)])
+
 
 class Alice:
     if not (os.path.isfile('prime.txt')):
@@ -77,7 +66,7 @@ class Alice:
 
     # The DHRatchet private key
     DHa_ratchet_priv = None
-
+    DHa_ratchet_pub = []
 
     def alice_init_ratchet(self):
         # initialise the root chain with the shared key
@@ -104,6 +93,7 @@ class Alice:
         self.send_ratchet = SymmRatchet(shared_send)
         print('[Alice]\tSend ratchet seed:', shared_send)
 
+
     def send(self, bob, msg):
         key, iv = self.send_ratchet.next()
         iv = bytes(iv.encode('UTF-8'))
@@ -117,19 +107,18 @@ class Alice:
 
         self.DHa_ratchet_pub = pow(self.g, self.DHa_ratchet_priv, self.p)
 
-        bob.recv(cipher2, self.DHa_ratchet_pub)
+        bob.recv(cipher2, self.DHa_ratchet_pub, key, iv)
 
-    def recv(self, cipher, bob_public_key):
+    def recv(self, cipher, bob_public_key, key, iv):
         self.dh_ratchet(bob_public_key)
-        key, iv = self.recv_ratchet.next()
-        iv = bytes(iv.encode('UTF-8'))
-        key = bytes(key.encode('UTF-8'))
+        # key, iv = self.recv_ratchet.next()
+        # iv = bytes(iv.encode('UTF-8'))
+        # key = bytes(key.encode('UTF-8'))
         pt2 = byte_xor(cipher, key)
         # print(pt2)
         pt1 = byte_xor(iv, pt2)
         # print(pt1)
         print('[Alice]\tDecrypted message:', pt1)
-
 
 
 def start():
@@ -164,7 +153,16 @@ def start():
 
             alice.send(bob, b'Hello mon ami')
 
-            bob.send(alice, b'Hello  !')
+            alice.send(bob, b'Comment va tu')
+
+            bob.send(alice, b'I am fine !')
+
+            bob.send(alice, b'Et toi ?')
+
+            alice.send(bob, b'Wht are you doing ?')
+
+            bob.send(alice, b'Nothing')
+
         else:
             print('Error')
             exit()

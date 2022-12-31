@@ -6,15 +6,6 @@ from Test.SymmRatchet import SymmRatchet
 # This will be the class of the second person to talk
 
 
-def pad(msg):
-    # pkcs7 padding
-    num = 16 - (len(msg) % 16)
-    return msg + bytes([num] * num)
-
-def unpad(msg):
-    # remove pkcs7 padding
-    return msg[:-msg[-1]]
-
 def byte_xor(ba1, ba2):
     return bytes([_a ^ _b for _a, _b in zip(ba1, ba2)])
 
@@ -106,14 +97,14 @@ class Bob:
 
         print('[Bob]\tSending ciphertext to Alice:', cipher2)
 
-        alice.recv(cipher2, self.DHb_ratchet_pub)
+        alice.recv(cipher2, self.DHb_ratchet_pub, key, iv)
 
-    def recv(self, cipher, alice_public_key):
+    def recv(self, cipher, alice_public_key, key, iv):
 
         self.dh_ratchet(alice_public_key)
-        key, iv = self.recv_ratchet.next()
-        iv = bytes(iv.encode('UTF-8'))
-        key = bytes(key.encode('UTF-8'))
+        # key, iv = self.recv_ratchet.next()
+        # iv = bytes(iv.encode('UTF-8'))
+        # key = bytes(key.encode('UTF-8'))
         pt2 = byte_xor(cipher, key)
         # print(pt2)
         pt1 = byte_xor(iv, pt2)
