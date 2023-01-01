@@ -129,7 +129,7 @@ def start():
 
     print(f'You are {alice.name}')
     # We publish the key bundles on the server
-    server.set_alice(alice.IDa_pub, alice.SPKa_pub, alice.SPKa_sig, alice.OTPKa_pub, alice.RSAa_pub, alice.RSAa_modulo,  alice.hashed_SPKa_pub, alice.EKa_pub)
+    server.set_alice(alice.IDa_pub, alice.SPKa_pub, alice.SPKa_sig, alice.OTPKa_pub, alice.RSAa_pub, alice.RSAa_modulo, alice.hashed_SPKa_pub, alice.EKa_pub)
     server.set_bob(bob.IDb_pub, bob.SPKb_pub, bob.SPKb_sig, bob.OTPKb_pub, bob.RSAb_pub, bob.RSAb_modulo, bob.hashed_SPKb_pub, bob.EKb_pub)
 
     # We need to fetch the bundle and check if the signature of Bob SPK is valid
@@ -138,6 +138,7 @@ def start():
         print('The Signature is valid')
         print('We will start the X3DH key exchange')
 
+        # We will do the X3DH and check if the shared key is the same
         if server.X3DH_alice_init(alice) == server.X3DH_bob_not_init(bob):
             print(f'The shared key is {alice.shared_key}')
 
@@ -151,17 +152,69 @@ def start():
 
             alice.dh_ratchet(bob.DHb_ratchet_pub)
 
-            alice.send(bob, b'Hello mon ami')
+            # To simplify, we can only talk to Bob
+            # The history of the conversation will be in a txt file
 
-            alice.send(bob, b'Comment va tu')
+            friend = 'bob'
 
-            bob.send(alice, b'I am fine !')
+            print(f'{alice.name} and {friend} will communicate !')
 
-            bob.send(alice, b'Et toi ?')
+            file = alice.name.lower() + '_' + friend.lower() + '.txt'
+            revfile = friend.lower() + '_' + alice.name.lower() + '.txt'
 
-            alice.send(bob, b'Wht are you doing ?')
+            # Verify if a text file between the two already exists
+            if not (os.path.isfile(file)) and not (os.path.isfile(revfile)):
+                f = open(file, "w")
+                print('File between ' + alice.name.lower() + ' and ' + friend.lower() + ' is created !')
+                f.write("start of the conversation between " + alice.name.lower() + " and " + friend.lower())
+                f.close()
+            else:
+                print('File between ' + alice.name.lower() + ' and ' + friend.lower() + ' already exists !')
 
-            bob.send(alice, b'Nothing')
+            talking = True
+
+            print('If you want to stop, type : STOP')
+
+            # For the talking method, they will have to say if they are Alice or Bob
+            while talking == True:
+
+                person_to_talk = ''
+
+                while True:
+                    person_to_talk = input('Who is talking ? Alice or Bob ? : ')
+
+                    if person_to_talk.lower() == 'alice' or person_to_talk.lower() == 'bob':
+                        break
+                    elif person_to_talk.lower() == 'stop':
+                        exit()
+                    else:
+                        print('Please write Alice or Bob')
+                        continue
+
+                if person_to_talk.lower() == 'alice':
+                    # print('Alice is going to talk')
+                    f = open(file, "a")
+                    new_input = input(alice.name + ' : ')
+                    if new_input.lower() == 'stop':
+                        talking = False
+                        f.close()
+                        break
+                    ciphertext = bytes(new_input.encode('UTF-8'))
+                    alice.send(bob, ciphertext)
+                    f.write('\n' + alice.name + ' : ' + new_input)
+                    f.close()
+
+                elif person_to_talk.lower() == 'bob':
+                    f = open(file, "a")
+                    new_input = input(bob.name + ' : ')
+                    if new_input.lower() == 'stop':
+                        talking = False
+                        f.close()
+                        break
+                    ciphertext = bytes(new_input.encode('UTF-8'))
+                    bob.send(alice, ciphertext)
+                    f.write('\n' + bob.name + ' : ' + new_input)
+                    f.close()
 
         else:
             print('Error')
@@ -171,66 +224,4 @@ def start():
         print('Error')
         exit()
 
-
-    '''
-    # Communication method for the moment
-    print('You are : ' + Alice.name)
-    
-    friend = input("Please enter the name of the person you want to talk to : ")
-    
-    print('You are going to talk to : ' + friend)
-    
-    file = Alice.name + '_' + friend + '.txt'
-    revfile = friend + '_' + Alice.name + '.txt'
-    
-    #Verify if a text file between the two already exists
-    if not (os.path.isfile(file)) and not (os.path.isfile(revfile)):
-        f = open(file, "w")
-        print('File between ' + Alice.name + ' and ' + friend + ' is created !')
-        f.write("start of the conversation between " + Alice.name + " and " + friend)
-        f.close()
-    else:
-        print('File between ' + Alice.name + ' and ' + friend + ' already exists !')
-    
-    mydir = Alice.name + '_dir'
-    friend_dir = friend + '_dir'
-    
-    #Create folder to share files 
-    if not (os.path.isdir(mydir)):
-        os.mkdir(mydir)
-        print(mydir + ' folder is created')
-    else:
-        print(friend_dir + ' folder is already created')
-    
-    if not (os.path.isdir(friend_dir)):
-        os.mkdir(friend_dir)
-        print(friend_dir + ' folder is created')
-    else:
-        print(friend_dir + ' folder is already created')
-    
-    #Make sure that whatever the order of the name, we will still write in the same file
-    #if the two people that communicate have the right names
-    if (os.path.isfile(file)):
-        file = file
-    else:
-        file = revfile
-    
-    print('\n-------------------------------------------')
-    print('Start of the communication \n')
-    
-    talking = True
-    
-    print('If you want to stop, type : STOP')
-    
-    #We need to create something to share the files
-    while talking == True:
-        f = open(file, "a")
-        new_input = input(Alice.name + ' : ')
-        if new_input.lower() == 'stop':
-            talking = False
-            f.close()
-            break
-        f.write('\n' + Alice.name + ' : ' + new_input)
-        f.close()
-    '''
 
